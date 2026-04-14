@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daya Engineering | Premium Stainless Steel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Loading Animation - White Theme */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-content {
+            text-align: center;
+            animation: pulseScale 0.8s ease-in-out infinite alternate;
+        }
+
+        .loader-content img {
+            width: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .loader-content h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @keyframes pulseScale {
+            from { transform: scale(0.95); opacity: 0.7; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #1e293b;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .admin-nav-btn {
+            background: #e2e8f0;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+
+        .admin-nav-btn:hover {
+            background: #cbd5e1;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.85);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 48px;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #2563eb, #06b6d4);
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+        }
+
+        /* Scroll Animation Classes */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+        }
+
+        .feature-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 28px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            transition: 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: #2563eb;
+            box-shadow: 0 20px 30px -12px rgba(37,99,235,0.15);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2rem; }
+            .nav-links { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+    <div class="loader-content">
+        <img src="https://cdn-icons-png.flaticon.com/512/2985/2985911.png" alt="Steel Icon">
+        <h2>Daya Engineering</h2>
+        <p style="color:#64748b;">Premium Stainless Steel</p>
+    </div>
+</div>
+
+<nav>
+    <a href="index.html" class="logo">DAYA <span style="color:#2563eb;">ENG.</span></a>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="admin.html" class="admin-nav-btn"><i class="fas fa-user-shield"></i> Admin</a></li>
+    </ul>
+</nav>
+
+<div class="hero" id="heroSection">
+    <div class="hero-content">
+        <h1>Stainless Steel with Daya Engineering</h1>
+        <p>📍 Nagolla, Dambulla Road | 📞 +94 75 133 2412</p>
+        <p>Precision. Durability. Excellence.</p>
+        <a href="shop.html" class="btn">Explore Products →</a>
+    </div>
+</div>
+
+<section class="features">
+    <h2 class="fade-up">Why Choose Us</h2>
+    <div class="feature-grid">
+        <div class="feature-card fade-up"><i class="fas fa-gem"></i><h3>Premium Quality</h3><p>304 grade stainless steel</p></div>
+        <div class="feature-card fade-up"><i class="fas fa-truck"></i><h3>Fast Delivery</h3><p>Island-wide shipping</p></div>
+        <div class="feature-card fade-up"><i class="fas fa-wrench"></i><h3>Custom Fabrication</h3><p>Tailored to your vehicle</p></div>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 Daya Engineering | Stainless Steel Specialists</p>
+</footer>
+
+<script>
+    // Load hero background from localStorage
+    function loadHeroBackground() {
+        const hero = document.getElementById('heroSection');
+        const savedBg = localStorage.getItem('daya_hero_image');
+        if (savedBg && savedBg !== '') {
+            hero.style.backgroundImage = `url('${savedBg}')`;
+        } else {
+            hero.style.backgroundImage = "url('https://images.pexels.com/photos/239309/pexels-photo-239309.jpeg?auto=compress&cs=tinysrgb&w=1600')";
+        }
+    }
+
+    // Hide loader after 0.8s
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }, 800);
+        loadHeroBackground();
+        initScrollAnimations();
+    });
+
+    // Intersection Observer for scroll animations
+    function initScrollAnimations() {
+        const elements = document.querySelectorAll('.fade-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.2 });
+        elements.forEach(el => observer.observe(el));
+    }
+</script>
+</body>
+</html>

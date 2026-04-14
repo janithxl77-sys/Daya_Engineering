@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard - Daya Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #0a0a1a; color: #e0e0e0; }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(10,10,26,0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,210,255,0.3);
+        }
+        .logo { font-size: 1.6rem; font-weight: 800; text-decoration: none; background: linear-gradient(135deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .btn {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); }
+        .admin-login, .admin-dashboard { max-width: 1300px; margin: 2rem auto; padding: 2rem; background: rgba(20,20,40,0.8); border-radius: 28px; border: 1px solid rgba(0,210,255,0.3); }
+        .stats-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .stat-card { background: linear-gradient(135deg, #00d2ff, #3a7bd5); padding: 1.2rem; border-radius: 24px; flex: 1; text-align: center; color: white; font-weight: bold; }
+        .admin-tabs { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .tab-btn { background: transparent; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; color: #ccc; font-weight: 600; cursor: pointer; }
+        .tab-btn.active { background: #00d2ff; color: #0a0a1a; }
+        .tab-pane { display: none; animation: fadeIn 0.3s; }
+        .tab-pane.active-pane { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .form-group { margin-bottom: 1rem; }
+        .form-control { width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid #444; background: #1e1e2f; color: white; font-family: inherit; }
+        .admin-table { width: 100%; border-collapse: collapse; background: #1e1e2f; border-radius: 16px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #333; }
+        .admin-table th { background: #2c3e66; color: #00d2ff; }
+        .action-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; margin: 0 4px; }
+        .edit { color: #f39c12; } .delete { color: #e74c3c; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1e1e2f; padding: 2rem; border-radius: 28px; width: 90%; max-width: 650px; border: 1px solid #00d2ff; max-height: 85vh; overflow-y: auto; }
+        .close-modal { float: right; font-size: 1.8rem; cursor: pointer; background: none; border: none; color: #00d2ff; }
+        .category-item, .product-item { background: #2a2a40; margin: 0.5rem 0; padding: 0.8rem; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .image-drop-area {
+            border: 2px dashed #00d2ff;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: #2a2a40;
+            transition: 0.2s;
+        }
+        .image-drop-area:hover { background: #3a3a55; }
+        .image-preview { max-width: 100%; max-height: 150px; margin-top: 0.5rem; border-radius: 12px; }
+        @media (max-width: 768px) { .stats-grid { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">DAYA <span style="color:#00d2ff;">ENG.</span></a>
+        <a href="index.html" class="btn" id="logoutBtn" style="display: none;">Logout / Home</a>
+    </nav>
+
+    <div id="loginSection" class="admin-login">
+        <h2 style="margin-bottom: 1.5rem;">🔐 Admin Access</h2>
+        <form id="loginForm">
+            <div class="form-group"><input type="password" id="adminPassword" class="form-control" placeholder="Enter Password (admin123)" required></div>
+            <button type="submit" class="btn" style="width:100%;">Login <i class="fas fa-arrow-right"></i></button>
+            <p id="loginError" style="color:#f44336; margin-top:1rem; display:none;">Invalid Password!</p>
+        </form>
+    </div>
+
+    <div id="dashboardSection" class="admin-dashboard" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:2rem;">
+            <h1 style="color:#00d2ff;"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+            <button class="btn" id="openAddProductModal"><i class="fas fa-plus"></i> Add New Product</button>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><i class="fas fa-box"></i><br><span id="statProducts">0</span><br>Products</div>
+            <div class="stat-card"><i class="fas fa-tags"></i><br><span id="statCategories">0</span><br>Categories</div>
+            <div class="stat-card"><i class="fas fa-heart"></i><br><span id="statLikes">0</span><br>Total Likes</div>
+        </div>
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="productsTab">📦 Products</button>
+            <button class="tab-btn" data-tab="categoriesTab">🏷️ Categories</button>
+            <button class="tab-btn" data-tab="fakeTab">💬 Fake</button>
+            <button class="tab-btn" data-tab="settingsTab">⚙️ Settings</button>
+        </div>
+        <div id="productsTab" class="tab-pane active-pane"><div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Size</th><th>Price</th><th>Likes</th><th>Actions</th></tr></thead><tbody id="adminProductsTable"></tbody></table></div></div>
+        <div id="categoriesTab" class="tab-pane"><div style="display:flex; gap:1rem; margin-bottom:1rem;"><input type="text" id="newCategoryName" class="form-control" placeholder="New category"><button class="btn" id="addCategoryBtn">+ Add</button></div><div id="categoriesList"></div></div>
+        <div id="fakeTab" class="tab-pane"><h3>Fake Comment</h3><select id="fakeProductSelect" class="form-control"></select><input type="text" id="fakeCommentText" class="form-control" placeholder="Fake comment"><button class="btn" id="addFakeCommentBtn">Add Comment</button><h3 style="margin-top:1rem;">Fake Likes</h3><select id="fakeLikesSelect" class="form-control"></select><input type="number" id="fakeLikesCount" class="form-control" placeholder="Number of likes"><button class="btn" id="addFakeLikesBtn">Add Likes</button></div>
+        <div id="settingsTab" class="tab-pane"><div class="form-group"><label>Hero Image URL (for homepage)</label><input type="text" id="heroImageInput" class="form-control" placeholder="https://..."><button class="btn" id="updateHeroImage" style="margin-top:0.5rem;">Update Hero Image</button></div><div class="form-group"><label>Change Admin Password</label><input type="password" id="newPassword" class="form-control" placeholder="New password"><input type="password" id="confirmPassword" class="form-control" placeholder="Confirm"><button class="btn" id="changePasswordBtn">Change Password</button></div><button class="btn" id="exportDataBtn" style="background:#27ae60;">Export Data</button><button class="btn" id="clearAllDataBtn" style="background:#c0392b; margin-left:1rem;">Delete All Data</button></div>
+    </div>
+
+    <!-- Product Modal with Image Upload (Drag & Drop) -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeProductModal">&times;</button>
+            <h2 id="modalTitle" style="color:#00d2ff;">Add Product</h2>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group"><label>Product Name</label><input type="text" id="prodName" class="form-control" required></div>
+                <div class="form-group"><label>Description</label><textarea id="prodDesc" class="form-control" rows="2"></textarea></div>
+                
+                <!-- Image upload area (drag & drop or click) -->
+                <div class="form-group">
+                    <label>Product Image</label>
+                    <div id="imageDropArea" class="image-drop-area">
+                        <i class="fas fa-cloud-upload-alt"></i> Drag & drop an image here or click to select<br>
+                        <small>Supports JPG, PNG, GIF (Max 2MB)</small>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </div>
+                    <img id="imagePreview" class="image-preview" style="display: none;">
+                </div>
+                
+                <div class="form-group"><label>Category</label><select id="prodCategory" class="form-control" required></select></div>
+                <div class="form-group"><label>Size</label><input type="text" id="prodSize" class="form-control" placeholder="e.g., 4x8 ft"></div>
+                <div class="form-group"><label>Finish</label><select id="prodFinish" class="form-control"><option>Mirror</option><option>Hairline</option><option>Matte</option><option>Brushed</option></select></div>
+                <div class="form-group"><label>Thickness</label><select id="prodThickness" class="form-control"><option>0.5mm</option><option>0.8mm</option><option>1.0mm</option><option>1.2mm</option><option>1.5mm</option><option>2.0mm</option></select></div>
+                <div class="form-group"><label>Color</label><select id="prodColor" class="form-control"><option>Silver</option><option>Gold</option><option>Black</option><option>Rose Gold</option></select></div>
+                <div class="form-group"><label>Price (LKR)</label><input type="text" id="prodPrice" class="form-control" required></div>
+                <div class="form-group"><label>Stock</label><select id="prodStock" class="form-control"><option value="true">In Stock</option><option value="false">Out of Stock</option></select></div>
+                <button type="submit" class="btn" style="width:100%;">Save Product</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let products = [], categories = [], adminPassword = "admin123";
+        const storedPass = localStorage.getItem('daya_admin_password');
+        if(storedPass) adminPassword = storedPass;
+
+        // Image upload handling (Base64)
+        let currentImageBase64 = null;
+        function setupImageUpload() {
+            const dropArea = document.getElementById('imageDropArea');
+            const fileInput = document.getElementById('imageInput');
+            const preview = document.getElementById('imagePreview');
+            
+            dropArea.addEventListener('click', () => fileInput.click());
+            dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.borderColor = '#fff'; });
+            dropArea.addEventListener('dragleave', () => dropArea.style.borderColor = '#00d2ff');
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) handleImageFile(file);
+            });
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) handleImageFile(e.target.files[0]);
+            });
+        }
+        
+        function handleImageFile(file) {
+            if (file.size > 2 * 1024 * 1024) { alert('Image too large (max 2MB)'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImageBase64 = e.target.result;
+                const preview = document.getElementById('imagePreview');
+                preview.src = currentImageBase64;
+                preview.style.display = 'block';
+                document.getElementById('imageDropArea').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function resetImageUpload() {
+            currentImageBase64 = null;
+            const preview = document.getElementById('imagePreview');
+            const dropArea = document.getElementById('imageDropArea');
+            preview.style.display = 'none';
+            preview.src = '';
+            dropArea.style.display = 'flex';
+            dropArea.style.display = 'block';
+        }
+
+        function loadData() {
+            const storedProducts = localStorage.getItem('daya_products');
+            const storedCategories = localStorage.getItem('daya_categories');
+            if(storedProducts) products = JSON.parse(storedProducts); else products = [];
+            if(storedCategories) categories = JSON.parse(storedCategories); else categories = [];
+            renderAdminProducts(); renderCategoriesList(); updateStats(); updateFakeSelects();
+        }
+        function saveProducts() { localStorage.setItem('daya_products', JSON.stringify(products)); }
+        function saveCategories() { localStorage.setItem('daya_categories', JSON.stringify(categories)); }
+        function getCategoryName(id) { let c = categories.find(c=>c.id===id); return c ? c.name : 'Uncategorized'; }
+        function renderAdminProducts() {
+            let tbody = document.getElementById('adminProductsTable'); if(!tbody) return;
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                let row = tbody.insertRow();
+                row.insertCell(0).innerHTML = `<img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">`;
+                row.insertCell(1).innerHTML = `<strong>${p.name}</strong>`;
+                row.insertCell(2).innerHTML = getCategoryName(p.categoryId);
+                row.insertCell(3).innerHTML = p.size || '-';
+                row.insertCell(4).innerHTML = `LKR ${p.price}`;
+                row.insertCell(5).innerHTML = `<i class="fas fa-heart" style="color:#e74c3c"></i> ${p.likes || 0}`;
+                row.insertCell(6).innerHTML = `<button class="action-btn edit" onclick="openEditProduct(${p.id})"><i class="fas fa-edit"></i></button> <button class="action-btn delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>`;
+            });
+            updateStats();
+        }
+        function renderCategoriesList() {
+            let container = document.getElementById('categoriesList'); if(!container) return;
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                let count = products.filter(p=>p.categoryId===cat.id).length;
+                container.innerHTML += `<div class="category-item"><span><strong>${cat.name}</strong> (${count} products)</span><div><button class="action-btn edit" onclick="editCategory(${cat.id})"><i class="fas fa-edit"></i></button><button class="action-btn delete" onclick="deleteCategory(${cat.id})"><i class="fas fa-trash"></i></button></div></div>`;
+            });
+            let catSelect = document.getElementById('prodCategory');
+            if(catSelect) { catSelect.innerHTML = ''; categories.forEach(cat => catSelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`); }
+            document.getElementById('statCategories').innerText = categories.length;
+        }
+        function updateStats() { document.getElementById('statProducts').innerText = products.length; document.getElementById('statLikes').innerText = products.reduce((s,p)=>s+(p.likes||0),0); }
+        function updateFakeSelects() { let fs=document.getElementById('fakeProductSelect'), fl=document.getElementById('fakeLikesSelect'); if(fs && fl) { fs.innerHTML=''; fl.innerHTML=''; products.forEach(p=>{ fs.innerHTML+=`<option value="${p.id}">${p.name}</option>`; fl.innerHTML+=`<option value="${p.id}">${p.name}</option>`; }); } }
+        
+        window.openEditProduct = (id) => {
+            let p=products.find(p=>p.id===id);
+            if(p){
+                document.getElementById('productId').value=p.id;
+                document.getElementById('prodName').value=p.name;
+                document.getElementById('prodDesc').value=p.description||'';
+                // For image, we show existing base64
+                if(p.image && p.image.startsWith('data:image')) {
+                    document.getElementById('imagePreview').src = p.image;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('imageDropArea').style.display = 'none';
+                    currentImageBase64 = p.image;
+                } else {
+                    resetImageUpload();
+                }
+                document.getElementById('prodCategory').value=p.categoryId;
+                document.getElementById('prodSize').value=p.size||'';
+                document.getElementById('prodFinish').value=p.finish||'Mirror';
+                document.getElementById('prodThickness').value=p.thickness||'1.0mm';
+                document.getElementById('prodColor').value=p.color||'Silver';
+                document.getElementById('prodPrice').value=p.price;
+                document.getElementById('prodStock').value=p.inStock?"true":"false";
+                document.getElementById('modalTitle').innerText='Edit Product';
+                document.getElementById('productModal').style.display='flex';
+            }
+        };
+        
+        window.deleteProduct = (id) => { if(confirm('Delete product?')){ products=products.filter(p=>p.id!==id); saveProducts(); renderAdminProducts(); renderCategoriesList(); } };
+        
+        function addOrUpdateProduct(e) {
+            e.preventDefault();
+            if(!currentImageBase64) { alert('Please upload an image!'); return; }
+            let id = document.getElementById('productId').value;
+            let data = {
+                name: document.getElementById('prodName').value,
+                description: document.getElementById('prodDesc').value,
+                image: currentImageBase64,
+                categoryId: parseInt(document.getElementById('prodCategory').value),
+                size: document.getElementById('prodSize').value,
+                finish: document.getElementById('prodFinish').value,
+                thickness: document.getElementById('prodThickness').value,
+                color: document.getElementById('prodColor').value,
+                price: document.getElementById('prodPrice').value,
+                inStock: document.getElementById('prodStock').value === 'true',
+                likes: 0,
+                comments: []
+            };
+            if(id){
+                let idx = products.findIndex(p=>p.id==id);
+                if(idx!==-1){
+                    data.id = parseInt(id);
+                    data.likes = products[idx].likes||0;
+                    data.comments = products[idx].comments||[];
+                    products[idx] = data;
+                }
+            } else {
+                let newId = products.length>0 ? Math.max(...products.map(p=>p.id))+1 : 1;
+                data.id = newId;
+                products.push(data);
+            }
+            saveProducts();
+            renderAdminProducts();
+            renderCategoriesList();
+            document.getElementById('productModal').style.display='none';
+            resetImageUpload();
+            document.getElementById('productForm').reset();
+        }
+        
+        function addCategory() { let name=document.getElementById('newCategoryName').value.trim(); if(!name) return; let newId=categories.length>0?Math.max(...categories.map(c=>c.id))+1:1; categories.push({id:newId,name}); saveCategories(); renderCategoriesList(); document.getElementById('newCategoryName').value=''; }
+        window.editCategory = (id) => { let cat=categories.find(c=>c.id===id); if(cat){ let newName=prompt('Edit category name:',cat.name); if(newName && newName.trim()){ cat.name=newName.trim(); saveCategories(); renderCategoriesList(); renderAdminProducts(); } } };
+        window.deleteCategory = (id) => { if(confirm('Delete category? Products become uncategorized.')){ categories=categories.filter(c=>c.id!==id); products.forEach(p=>{ if(p.categoryId===id) p.categoryId=null; }); saveCategories(); saveProducts(); renderCategoriesList(); renderAdminProducts(); } };
+        function addFakeComment(){ let id=parseInt(document.getElementById('fakeProductSelect').value); let txt=document.getElementById('fakeCommentText').value.trim(); if(!txt) return; let p=products.find(p=>p.id===id); if(p){ p.comments=p.comments||[]; p.comments.push(`⭐ ${txt}`); saveProducts(); alert('Fake comment added'); document.getElementById('fakeCommentText').value=''; } }
+        function addFakeLikes(){ let id=parseInt(document.getElementById('fakeLikesSelect').value); let cnt=parseInt(document.getElementById('fakeLikesCount').value); if(isNaN(cnt)||cnt<=0) return; let p=products.find(p=>p.id===id); if(p){ p.likes=(p.likes||0)+cnt; saveProducts(); renderAdminProducts(); alert(`${cnt} fake likes added`); document.getElementById('fakeLikesCount').value=''; } }
+        function updateHeroImage(){ let url=document.getElementById('heroImageInput').value; if(url){ localStorage.setItem('daya_hero_image',url); alert('Hero image updated!'); } }
+        function changePassword(){ let np=document.getElementById('newPassword').value, cp=document.getElementById('confirmPassword').value; if(np!==cp) alert('Passwords do not match'); else if(np.length<4) alert('Min 4 chars'); else { adminPassword=np; localStorage.setItem('daya_admin_password',adminPassword); alert('Password changed'); } }
+        function exportData(){ let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({categories,products},null,2)],{type:"application/json"})); a.download=`daya_backup_${new Date().toISOString().slice(0,19)}.json`; a.click(); }
+        function clearAllData(){ if(confirm('⚠️ WARNING: All data will be deleted. Continue?')){ products=[]; categories=[]; saveProducts(); saveCategories(); renderAdminProducts(); renderCategoriesList(); alert('All data cleared'); } }
+        function initTabs(){ document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active-pane')); document.getElementById(btn.getAttribute('data-tab')).classList.add('active-pane'); document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }); }); }
+        
+        document.getElementById('loginForm').addEventListener('submit',(e)=>{ e.preventDefault(); let pwd=document.getElementById('adminPassword').value; if(pwd===adminPassword){ document.getElementById('loginSection').style.display='none'; document.getElementById('dashboardSection').style.display='block'; document.getElementById('logoutBtn').style.display='inline-flex'; loadData(); let hero=localStorage.getItem('daya_hero_image'); if(hero) document.getElementById('heroImageInput').value=hero; } else { document.getElementById('loginError').style.display='block'; } });
+        document.getElementById('logoutBtn').addEventListener('click',()=>{ document.getElementById('loginSection').style.display='block'; document.getElementById('dashboardSection').style.display='none'; document.getElementById('logoutBtn').style.display='none'; });
+        document.getElementById('openAddProductModal').addEventListener('click',()=>{ document.getElementById('productForm').reset(); document.getElementById('productId').value=''; document.getElementById('modalTitle').innerText='Add Product'; resetImageUpload(); document.getElementById('productModal').style.display='flex'; });
+        document.getElementById('closeProductModal').addEventListener('click',()=>{ document.getElementById('productModal').style.display='none'; });
+        document.getElementById('productForm').addEventListener('submit',addOrUpdateProduct);
+        document.getElementById('addCategoryBtn').addEventListener('click',addCategory);
+        document.getElementById('addFakeCommentBtn').addEventListener('click',addFakeComment);
+        document.getElementById('addFakeLikesBtn').addEventListener('click',addFakeLikes);
+        document.getElementById('updateHeroImage').addEventListener('click',updateHeroImage);
+        document.getElementById('changePasswordBtn').addEventListener('click',changePassword);
+        document.getElementById('exportDataBtn').addEventListener('click',exportData);
+        document.getElementById('clearAllDataBtn').addEventListener('click',clearAllData);
+        initTabs();
+        setupImageUpload();
+        window.onclick = function(e) { if(e.target===document.getElementById('productModal')) document.getElementById('productModal').style.display='none'; };
+    </script>
+</body>
+</html>
